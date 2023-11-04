@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Library Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="mt-5 py-3">Online Library Management System</h2>
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <h3 class="py-3 fw-normal">Book List</h3>
+                <ul id="book-list" class="list-group">
+                    <!-- Display books here -->
+                </ul>
+            </div>
+
+            <div class="col-md-4">
+                <h3 class="py-3 fw-normal">Add New Book</h3>
+                <form id="add-book-form">
+                    <div class="form-group mb-3">
+                        <input type="text" class="form-control" id="title" placeholder="Title" required>
+                    </div>
+                    <div class="form-group my-3">
+                        <input type="text" class="form-control" id="author" placeholder="Author" required>
+                    </div>
+                    <div class="form-group my-3">
+                        <input type="text" class="form-control" id="isbn" placeholder="ISBN" required>
+                    </div>
+                    <div class="form-group my-4">
+                        <button type="submit" class="btn btn-primary">Add Book</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-4">
+                <h3 class="py-3 fw-normal">Search for Books</h3>
+                <input type="text" id="search-input" class="form-control" placeholder="Search books">
+                <ul id="search-results" class="list-group mt-3">
+                    <!-- Display search results here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        const books = [];
+        let bookNumber = 1;
+
+        const bookList = document.getElementById("book-list");
+        const addBookForm = document.getElementById("add-book-form");
+        const titleInput = document.getElementById("title");
+        const authorInput = document.getElementById("author");
+        const isbnInput = document.getElementById("isbn");
+        const searchInput = document.getElementById("search-input");
+        const searchResults = document.getElementById("search-results");
+
+        addBookForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const title = titleInput.value.trim();
+            const author = authorInput.value.trim();
+            const isbn = isbnInput.value.trim();
+
+            if (title && author && isbn) {
+                if (!isDuplicate(title, author, isbn)) {
+                    addBook(title, author, isbn);
+                    titleInput.value = "";
+                    authorInput.value = "";
+                    isbnInput.value = "";
+                } else {
+                    alert("This book already exists in the library.");
+                }
+            }
+        });
+
+        searchInput.addEventListener("input", function () {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const filteredBooks = books.filter((book) => {
+                return (
+                    book.title.toLowerCase().includes(searchTerm) ||
+                    book.author.toLowerCase().includes(searchTerm) ||
+                    book.isbn.toLowerCase().includes(searchTerm)
+                );
+            });
+            displaySearchResults(filteredBooks);
+        });
+
+        function addBook(title, author, isbn) {
+            const book = { title, author, isbn, number: bookNumber++ };
+            books.push(book);
+            displayBooks();
+        }
+
+        function displayBooks() {
+            bookList.innerHTML = "";
+            books.forEach((book) => {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item";
+                listItem.innerHTML = `#${book.number}: ${book.title} by <strong>${book.author}</strong> (ISBN: <strong>${book.isbn}</strong>)`;
+                bookList.appendChild(listItem);
+            });
+        }
+
+        function displaySearchResults(filteredBooks) {
+            searchResults.innerHTML = "";
+            filteredBooks.forEach((book) => {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item";
+                listItem.innerHTML = `#${book.number}: ${book.title} by <strong>${book.author}</strong> (ISBN: <strong>${book.isbn}</strong>)`;
+                searchResults.appendChild(listItem);
+            });
+        }
+
+        function isDuplicate(title, author, isbn) {
+            return books.some((book) => book.title === title && book.author === author && book.isbn === isbn);
+        }
+    </script>
+</body>
+</html>
